@@ -5,7 +5,6 @@ import argparse
 from omegaconf import OmegaConf
 import numpy as np
 from PIL import Image
-import imageio.v3 as iio
 
 from datasets.custom_dataset import CustomTestDataset
 from torch.utils.data import DataLoader

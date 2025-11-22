@@ -2,12 +2,10 @@ from diffusers import AutoencoderKLWan, WanPipeline
 from diffusers.utils import replace_example_docstring
 import torch
 from typing import Any, Callable, Dict, List, Optional, Union
+from dataclasses import dataclass
+
 from diffusers.callbacks import MultiPipelineCallbacks, PipelineCallback
 from diffusers.utils import is_torch_xla_available
-
-from dataclasses import dataclass
-from diffusers.utils import BaseOutput
-
 from diffusers.pipelines.wan.pipeline_output import WanPipelineOutput
 
 if is_torch_xla_available():

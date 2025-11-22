@@ -6,7 +6,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 from diffusers.utils.torch_utils import maybe_allow_in_graph
-from diffusers.models.attention import AttentionModuleMixin, FeedForward
+from diffusers.models.attention import FeedForward
 from diffusers.models.normalization import FP32LayerNorm
 from diffusers.models.attention_processor import Attention
 

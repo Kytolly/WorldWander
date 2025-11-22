@@ -1,17 +1,11 @@
 from pytorch_lightning.callbacks import TQDMProgressBar
-from pytorch_lightning.utilities.rank_zero import rank_zero_info
 import torch
 from typing import Any, Dict, List, Tuple, Optional
-from diffusers.models.embeddings import get_3d_rotary_pos_embed
 from pytorch_lightning.callbacks import ModelCheckpoint
 from pytorch_lightning import Callback
-from pytorch_lightning.utilities import rank_zero_only
 import pytorch_lightning as L
 
-from transformers import T5EncoderModel, T5Tokenizer
-from typing import List, Optional, Tuple, Union
 import os
-import math
 import torchvision
 
 

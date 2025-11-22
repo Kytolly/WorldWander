@@ -5,9 +5,7 @@ from torch.utils.data import DataLoader
 import torch.nn.functional as F
 import pytorch_lightning as L
 from pytorch_lightning.loggers import WandbLogger
-from pytorch_lightning.utilities import rank_zero_only
 import wandb
-import copy
 import numpy as np
 import torchvision
 
@@ -17,7 +15,7 @@ from tools.util import CustomProgressBar, CustomModelCheckpoint
 from tools.util import masks_like, resolve_strategy
 
 from diffusers import AutoencoderKLWan
-from diffusers.utils import export_to_video, load_image, load_video
+from diffusers.utils import export_to_video
 from models.wan2.custom_pipeline_rope import CustomWanPipeline
 from models.wan2.transformer_wan_rope import CustomWanTransformer3DModel
 
@@ -28,9 +26,6 @@ from diffusers import FlowMatchEulerDiscreteScheduler, UniPCMultistepScheduler
 from transformers import AutoTokenizer, UMT5EncoderModel
 import torch
 import random
-import warnings
-from einops import rearrange, repeat
-from diffusers.models.attention_processor import Attention
 os.environ["TOKENIZERS_PARALLELISM"] = "false"
 
 
