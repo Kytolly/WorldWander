@@ -396,7 +396,7 @@ def main(opt):
             CustomModelCheckpoint(
                 dirpath=os.path.join(opt.output_root, opt.experiment_name, 'checkpoints'),
                 filename="{step}",
-                every_n_train_steps=100,
+                every_n_train_steps=opt.training.save_val_interval_steps,
                 save_top_k=-1,
                 save_weights_only=True if opt.training.strategy == 'fsdp' else False,
                 verbose=False,
