@@ -128,13 +128,12 @@ def main(opt):
         pin_memory=opt.dataset.pin_memory,
         shuffle=False,
     )
-    breakpoint()
     system = WorldWanderInferenceSystem.load_from_checkpoint(opt.ckpt_path, opt=opt)
     trainer = L.Trainer(
         logger=False,
         precision=opt.training.precision,
         log_every_n_steps=1,
-        accelerator=opt.training.accelerator, # 
+        accelerator=opt.training.accelerator,
         strategy=opt.training.strategy,
         benchmark=opt.training.benchmark,
         num_nodes=opt.num_nodes,
