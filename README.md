@@ -37,13 +37,12 @@ conda activate WorldWander
 WorldWander is trained on the [wan2.2-TI2V-5B](https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B-Diffusers) model using 4 H200 GPUs, with a batch size of 4 per GPU.
 To make it easier for you to use directly, we provide the following checkpoints for different tasks.
 
-| Models                        | Links               | config                             | Description                                                  |
-| ----------------------------- | ------------------- | ---------------------------------- | ------------------------------------------------------------ |
-| wan2.2_5B-three2one-synthetic | 🤗[Huggingface](xxx) | configs/wan2-2_lora_three2one.yaml | Third-person to first-person perspective, synthetic scenariossynthetic scenarios, 720p resolution. |
-| wan2.2_5B-one2three-synthetic | 🤗[Huggingface](xxx) | configs/wan2-2_lora_one2three.yaml | First-person to third-person perspective, synthetic scenarios, 720p resolution. |
-| wan2.2_5B-three2one-realworld | 🤗[Huggingface](xxx) | configs/wan2-2_lora_three2one.yaml | Third-person to first-person perspective, real-world scenarios, 720p resolution. |
-| wan2.2_5B-one2three-realworld | 🤗[Huggingface](xxx) | configs/wan2-2_lora_one2three.yaml | First-person to third-person perspective, real-world scenarios, 720p resolution. |
-
+| Models                             | Links               | config                             |
+| ---------------------------------- | ------------------- | ---------------------------------- |
+| wan2.2_TI2V_5B-three2one-synthetic | 🤗[Huggingface](xxx) | configs/wan2-2_lora_three2one.yaml |
+| wan2.2_TI2V_5B-one2three-synthetic | 🤗[Huggingface](xxx) | configs/wan2-2_lora_one2three.yaml |
+| wan2.2_TI2V_5B-three2one-realworld | 🤗[Huggingface](xxx) | configs/wan2-2_lora_three2one.yaml |
+| wan2.2_TI2V_5B-one2three-realworld | 🤗[Huggingface](xxx) | configs/wan2-2_lora_one2three.yaml |
 
 
 You can download the specific checkpoint above and specify the corresponding config file for inference.
