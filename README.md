@@ -17,7 +17,7 @@ Overall framework is shown below:
 
 ## 🤗 Datasets
 To further support our task, we curate <b>[EgoExo-8K](XXX)</b>, a large-scale dataset containing synchronized egocentric–exocentric triplets from both <i>synthetic</i> and <i>real-world</i> scenarios.
-We show some case below:
+We show some examples below:
 ![Datasets Example](assets/datasets_example.png)
 
 
@@ -39,10 +39,10 @@ To make it easier for you to use directly, we provide the following checkpoints 
 
 | Models                             | Links | config | Description                                                  |
 | ---------------------------------- | ----- | ------ | ------------------------------------------------------------ |
-| wan2.2-TI2V-5B-three2one-synthetic | XXX   | XXX    | Third-person to first-person perspective, synthetic scenarios, 720p resolution. |
-| wan2.2-TI2V-5B-one2three-synthetic | XXX   | XXX    | First-person to third-person perspective, synthetic scenarios, 720p resolution. |
-| wan2.2-TI2V-5B-three2one-realworld | XXX   | XXX    | Third-person to first-person perspective, real-world scenarios, 720p resolution. |
-| wan2.2-TI2V-5B-one2three-realworld | XXX   | XXX    | First-person to third-person perspective, real-world scenarios, 720p resolution. |
+| wan2.2_5B-three2one-synthetic | 🤗[Huggingface](xxx)   | XXX    | Third-person to first-person perspective, synthetic scenarios, 720p resolution. |
+| wan2.2_5B-one2three-synthetic | 🤗[Huggingface](xxx)   | XXX    | First-person to third-person perspective, synthetic scenarios, 720p resolution. |
+| wan2.2_5B-three2one-realworld | 🤗[Huggingface](xxx)   | XXX    | Third-person to first-person perspective, real-world scenarios, 720p resolution. |
+| wan2.2_5B-one2three-realworld | 🤗[Huggingface](xxx)   | XXX    | First-person to third-person perspective, real-world scenarios, 720p resolution. |
 
 You can download the specific checkpoint above and specify the corresponding config file for inference.
 For convenience, we have provided the following example script:
