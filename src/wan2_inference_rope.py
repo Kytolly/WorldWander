@@ -128,6 +128,9 @@ def main(opt):
         shuffle=False,
     )
     system = WorldWanderInferenceSystem.load_from_checkpoint(opt.ckpt_path, opt=opt)
+    # ckpt = torch.load(opt.ckpt_path)
+    # system = WorldWanderInferenceSystem(opt=opt)
+    # system.load_state_dict(ckpt['state_dict'])
     trainer = L.Trainer(
         logger=False,
         precision=opt.training.precision,
