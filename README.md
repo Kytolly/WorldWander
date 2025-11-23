@@ -8,6 +8,8 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 </div>
 
 
+
+
 ## 🎬 Overview
 Video diffusion models have recently achieved remarkable progress in realism and controllability. However, achieving seamless video translation across different perspectives, such as first-person (egocentric) and third-person (exocentric), remains underexplored. Bridging these perspectives is crucial for filmmaking, embodied AI, and world models.
 Motivated by this, we present <b>WorldWander</b>, an in-context learning framework tailored for translating between egocentric and exocentric worlds in video generation. Building upon advanced video diffusion transformers, WorldWander integrates (i) <i>In-Context Perspective Alignment</i> and (ii) <i>Collaborative Position Encoding</i> to efficiently model cross-view synchronization.
