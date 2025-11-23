@@ -12,7 +12,7 @@ training:
   batch_size: 4
   max_steps: 8001
   warmup_steps: 10
-  rank: 80
+  rank: 128
   learning_rate: 5e-5
   weight_decay: 1e-2
   save_val_interval_steps: 500

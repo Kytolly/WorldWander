@@ -109,9 +109,9 @@ class WorldWanderInferenceSystem(WorldWanderTrainSystem):
 def main(opt):
     L.seed_everything(opt.seed)
     test_dataset = CustomTestDataset(
-        first_video_root="/mnt/nfs/workspace/sqj/EgoExoTestCrop/First_Video",
-        third_video_root="/mnt/nfs/workspace/sqj/EgoExoTestCrop/Third_Video",
-        ref_image_root="/mnt/nfs/workspace/sqj/kkk3",
+        first_video_root=opt.first_video_root,
+        third_video_root=opt.third_video_root,
+        ref_image_root=opt.ref_image_root,
         #
         height=opt.dataset.height,
         width=opt.dataset.width,
@@ -144,6 +144,9 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/wan2-2_lora_three2one.yaml", help="path to the yaml config file")
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--first_video_root", type=str, help="rewrite the first_video_root in the config")
+    parser.add_argument("--third_video_root", type=str, help="rewrite the third_video_root in the config")
+    parser.add_argument("--ref_image_root", type=str, help="rewrite the ref_image_root in the config")
     parser.add_argument("--ckpt_path", type=str)
     parser.add_argument("--pred_path", type=str, default="", help="save path for inference")
     # ----------------------------------------------------------------------

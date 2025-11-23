@@ -10,13 +10,15 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 
 ## 🎬 Overview
 Video diffusion models have recently achieved remarkable progress in realism and controllability. However, achieving seamless video translation across different perspectives, such as first-person (egocentric) and third-person (exocentric), remains underexplored. Bridging these perspectives is crucial for filmmaking, embodied AI, and world models.
-Motivated by this, we present <b>WorldWander</b>, an in-context learning framework tailored for translating between egocentric and exocentric worlds in video generation. Building upon advanced video diffusion transformers, WorldWander integrates (i) <i>In-Context Perspective Alignment</i> and (ii) <i>Collaborative Position Encoding </i> to efficiently model cross-view synchronization.
+Motivated by this, we present <b>WorldWander</b>, an in-context learning framework tailored for translating between egocentric and exocentric worlds in video generation. Building upon advanced video diffusion transformers, WorldWander integrates (i) <i>In-Context Perspective Alignment</i> and (ii) <i>Collaborative Position Encoding</i> to efficiently model cross-view synchronization.
 Overall framework is shown below:
 ![Overall Framework](assets/overall_pipeline.png)
 
 
 ## 🤗 Datasets
-To further support our task, we curate <b>EgoExo-8K</b>, a large-scale dataset containing synchronized egocentric–exocentric triplets from both <i>synthetic</i> and <i>real-world</i> scenarios. Details are provided in XXX.
+To further support our task, we curate <b>[EgoExo-8K](XXX)</b>, a large-scale dataset containing synchronized egocentric–exocentric triplets from both <i>synthetic</i> and <i>real-world</i> scenarios.
+We show some case below:
+![Datasets Example](assets/datasets_example.png)
 
 
 ## 🔧 Environment
@@ -31,14 +33,31 @@ conda env create -f environment.yml
 conda activate WorldWander
 ```
 
-## 🔥 Train
-```
-bash scripts/train_wan2.sh
-```
+## 🚀 Try Inference
+WorldWander is trained on the [wan2.2-TI2V-5B](https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B-Diffusers) model using 4 H200 GPUs, with a batch size of 4 per GPU.
+To make it easier for you to use directly, we provide the following checkpoints for different tasks.
 
-## 🚀 Inference
+| Models                             | Links | config | Description                                                  |
+| ---------------------------------- | ----- | ------ | ------------------------------------------------------------ |
+| wan2.2-TI2V-5B-three2one-synthetic | XXX   | XXX    | Third-person to first-person perspective, synthetic scenarios, 720p resolution. |
+| wan2.2-TI2V-5B-one2three-synthetic | XXX   | XXX    | First-person to third-person perspective, synthetic scenarios, 720p resolution. |
+| wan2.2-TI2V-5B-three2one-realworld | XXX   | XXX    | Third-person to first-person perspective, real-world scenarios, 720p resolution. |
+| wan2.2-TI2V-5B-one2three-realworld | XXX   | XXX    | First-person to third-person perspective, real-world scenarios, 720p resolution. |
+
+You can download the specific checkpoint above and specify the corresponding config file for inference.
+For convenience, we have provided the following example script:
 ```
 bash scripts/inference_wan2.sh
+```
+Note that the parameter `ckpt_path` needs to be updated to the path of the checkpoint you downloaded.
+<b>It is recommended to run this on a GPU with 80GB of VRAM to avoid running out of memory.</b>
+
+
+## 🔥 Custom Training
+You can also train on your custom dataset. To achieve this, you first need to adjust the `first_video_root`, `third_video_root`, `ref_image_root`, and other parameters in corresponding config file. If necessary, you may need to modify the `CustomTrainDataset` class in `dataset/custom_dataset.py` according to the attributes of your own dataset.
+For convenience, we have provided the following training script:
+```
+bash scripts/train_wan2.sh
 ```
 
 ## 🎓 Bibtex

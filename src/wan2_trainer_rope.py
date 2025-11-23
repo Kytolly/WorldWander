@@ -368,7 +368,7 @@ def main(opt):
         name=opt.experiment_name,
         save_dir=os.path.join(opt.output_root, opt.experiment_name),
         log_model=False,
-        offline=False,
+        offline=True,
     )
     # define trainer
     trainer = L.Trainer(
@@ -403,7 +403,7 @@ def main(opt):
     trainer.fit(system,
         train_dataloaders=train_dataloader,
         val_dataloaders=val_dataloader,
-        # ckpt_path='resume-path'
+        # ckpt_path='resume_path'
     )
 
 
