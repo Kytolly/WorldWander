@@ -4,26 +4,28 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 </h1>
 
 
+<p align="center">
+    <span>
+        <a href="" target="_blank"> 
+        <img src='' alt='Paper PDF'></a> &emsp;  &emsp; 
+    </span>
+    <span> 
+        <a href='https://lulupig12138.github.io/WorldWander' target="_blank">
+        <img src='' alt='Project Page'></a>  &emsp;  &emsp;
+    </span>
+    <span> 
+        <a href='' target="_blank"> 
+        <img src='' alt='Hugging Face'></a> &emsp;  &emsp;
+    </span>
+</p>
 
 </div>
 
 
-## 🎬 Demo
-<b>TL;DR:</b> We propose WorldWander, an in-context learning framework tailored for translating between egocentric and exocentric worlds in video generation. We also release <b>[EgoExo-8K](XXX)</b>, a large-scale dataset containing synchronized egocentric–exocentric triplets. The demo is shown below:
 
-
-#### Exocentric-to-Egocentric
-| ExoVideo  | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) |
-| ------ | ------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------- |
-| **Output** | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) |
-
-
-#### Egocentric-to-Exocentric
-| **RefImage**  | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) |
-| ------ | ------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------- |
-| **EgoVideo**  | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) |
-| **Output** | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) |
-
+## 🎬 Teaser
+<b>TL;DR:</b> We propose WorldWander, an in-context learning framework tailored for translating between egocentric and exocentric worlds in video generation. We also release <b>[EgoExo-8K](XXX)</b>, a large-scale dataset containing synchronized egocentric–exocentric triplets. The teaser is shown below:
+![Overall Framework](assets/teaser.png)
 
 
 
