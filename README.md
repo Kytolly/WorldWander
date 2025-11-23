@@ -13,7 +13,7 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 
 
 #### Exocentric-to-Egocentric
-| **ExoVideo**  | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) |
+| ExoVideo  | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) |
 | ------ | ------------------------------------------------- | ------------------------------------------------- | ------------------------------------------------- |
 | **Output** | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) | ![Overall Framework](assets/overall_pipeline.png) |
 
