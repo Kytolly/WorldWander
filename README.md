@@ -37,12 +37,14 @@ conda activate WorldWander
 WorldWander is trained on the [wan2.2-TI2V-5B](https://huggingface.co/Wan-AI/Wan2.2-TI2V-5B-Diffusers) model using 4 H200 GPUs, with a batch size of 4 per GPU.
 To make it easier for you to use directly, we provide the following checkpoints for different tasks.
 
-| Models                             | Links | config | Description                                                  |
-| ---------------------------------- | ----- | ------ | ------------------------------------------------------------ |
-| wan2.2_5B-three2one-synthetic | 🤗[Huggingface](xxx)   | XXX    | Third-person to first-person perspective, synthetic scenarios, 720p resolution. |
-| wan2.2_5B-one2three-synthetic | 🤗[Huggingface](xxx)   | XXX    | First-person to third-person perspective, synthetic scenarios, 720p resolution. |
-| wan2.2_5B-three2one-realworld | 🤗[Huggingface](xxx)   | XXX    | Third-person to first-person perspective, real-world scenarios, 720p resolution. |
-| wan2.2_5B-one2three-realworld | 🤗[Huggingface](xxx)   | XXX    | First-person to third-person perspective, real-world scenarios, 720p resolution. |
+| Models                        | Links               | config                             | Description                                                  |
+| ----------------------------- | ------------------- | ---------------------------------- | ------------------------------------------------------------ |
+| wan2.2_5B-three2one-synthetic | 🤗[Huggingface](xxx) | configs/wan2-2_lora_three2one.yaml | Third-person to first-person perspective, synthetic scenariossynthetic scenarios, 720p resolution. |
+| wan2.2_5B-one2three-synthetic | 🤗[Huggingface](xxx) | configs/wan2-2_lora_one2three.yaml | First-person to third-person perspective, synthetic scenarios, 720p resolution. |
+| wan2.2_5B-three2one-realworld | 🤗[Huggingface](xxx) | configs/wan2-2_lora_three2one.yaml | Third-person to first-person perspective, real-world scenarios, 720p resolution. |
+| wan2.2_5B-one2three-realworld | 🤗[Huggingface](xxx) | configs/wan2-2_lora_one2three.yaml | First-person to third-person perspective, real-world scenarios, 720p resolution. |
+
+
 
 You can download the specific checkpoint above and specify the corresponding config file for inference.
 For convenience, we have provided the following example script:
@@ -50,7 +52,7 @@ For convenience, we have provided the following example script:
 bash scripts/inference_wan2.sh
 ```
 Note that the parameter `ckpt_path` needs to be updated to the path of the checkpoint you downloaded.
-<b>It is recommended to run this on a GPU with 80GB of VRAM to avoid running out of memory.</b>
+<b>It is recommended to run this on a GPU with 80GB of VRAM to avoid out of memory.</b>
 
 
 ## 🔥 Custom Training
