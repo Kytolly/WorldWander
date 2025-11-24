@@ -8,7 +8,7 @@ CUDA_VISIBLE_DEVICES=1 python src/wan2_inference_rope.py --config=configs/wan2-2
                         --first_video_root="/mnt/nfs/workspace/sqj/EgoExoTestCrop/First_Video" \
                         --third_video_root="/mnt/nfs/workspace/sqj/EgoExoTestCrop/Third_Video" \
                         --ref_image_root="/mnt/nfs/workspace/sqj/kkk3" \
-                        --pred_path="pred_results/xxx"
+                        --pred_path="pred_results/three2one_synthetic"
 
 
 # one2three, synthetic scenarios

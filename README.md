@@ -4,6 +4,15 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 </h1>
 
 
+<div>
+    <a href='' target='_blank' style='text-decoration:none'>Quanjian Song<sup>1,2*</sup></a>, &ensp;
+    <a href='' target='_blank' style='text-decoration:none'>Yiren Song<sup>1，2*</sup></a>, &ensp;
+    <a href='' target='_blank' style='text-decoration:none'>Kelly Peng<sup>2</sup></a>, &ensp;
+    <a href='' target='_blank' style='text-decoration:none'>Yuan Gao<sup>2</sup></a>, &ensp;
+    <a href='' target='_blank' style='text-decoration:none'>Mike Zheng Shou<sup>1,†</sup></a>, &ensp;
+</div>
+
+
 <p align="center">
     <span>
         <a href="" target="_blank"> 
@@ -24,7 +33,7 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 
 
 ## 🎬 Teaser
-<b>TL;DR:</b> We propose WorldWander, an in-context learning framework tailored for translating between egocentric and exocentric worlds in video generation. We also release <b>[EgoExo-8K](XXX)</b>, a large-scale dataset containing synchronized egocentric–exocentric triplets. The teaser is shown below:
+<b>TL;DR:</b> We propose WorldWander, an in-context learning framework tailored for translating between egocentric and exocentric worlds in video generation. We also release [EgoExo-8K](XXX), a large-scale dataset containing synchronized egocentric–exocentric triplets. The teaser is shown below:
 ![Overall Framework](assets/teaser.png)
 
 

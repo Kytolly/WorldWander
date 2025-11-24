@@ -2,13 +2,13 @@ export PYTHONPATH=$(pwd)
 
 
 # three2one, synthetic scenarios
-CUDA_VISIBLE_DEVICES=2 python src/wan2_inference_rope.py --config=configs/wan2-2_lora_three2one_synthetic.yaml \
+CUDA_VISIBLE_DEVICES=1 python src/wan2_inference_rope.py --config=configs/wan2-2_lora_three2one_synthetic.yaml \
                         --seed=1234 \
-                        --ckpt_path="/mnt/nfs/workspace/sqj/InteractionVideo/outputs/wan2-three2one-r-128/5e5-rope-copy-no-mask-stride-2-v1/checkpoints/step=7000.ckpt" \
+                        --ckpt_path="/mnt/nfs/workspace/sqj/InteractionVideo/outputs/wan2-three2one/5e5-rope-copy-no-mask-stride-2-v1/checkpoints/step=7000.ckpt" \
                         --first_video_root="/mnt/nfs/workspace/sqj/EgoExoTestCrop/First_Video" \
                         --third_video_root="/mnt/nfs/workspace/sqj/EgoExoTestCrop/Third_Video" \
-                        --ref_image_root="/mnt/nfs/workspace/sqj/kkk3" \
-                        --pred_path="pred_results/three2one"
+                        --ref_image_root="/mnt/nfs/workspace/sqj/EgoExoTestCrop/Reference_Image" \
+                        --pred_path="pred_results/three2one_synthetic-7k"
 
 
 # one2three, synthetic scenarios

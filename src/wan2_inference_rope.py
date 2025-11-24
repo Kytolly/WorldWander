@@ -59,7 +59,7 @@ class WorldWanderInferenceSystem(WorldWanderTrainSystem):
             meta = meta.permute(0, 2, 3, 1).cpu().numpy()
             #
             first_pixel_values = self.vae.encode(first_pixel_values).latent_dist.sample() # [B, C, F, H, W]
-            first_pixel_values = (modefirst_pixel_valuesl_input - self.latents_mean) / self.latents_std # scaling
+            first_pixel_values = (first_pixel_values - self.latents_mean) / self.latents_std # scaling
             attention_kwargs = {
                 'encoder_condition_states': first_pixel_values,
                 'encoder_ref_states': ref_pixel_values,
