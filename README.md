@@ -22,6 +22,8 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
     </sub>
 </div>
 
+<sub></sub>
+
 <p align="center">
     <span>
         <a href="" target="_blank"> 
