@@ -9,9 +9,18 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
     <a href='' target='_blank' style='text-decoration:none'>Yiren Song<sup>1，2*</sup></a>, &ensp;
     <a href='' target='_blank' style='text-decoration:none'>Kelly Peng<sup>2</sup></a>, &ensp;
     <a href='' target='_blank' style='text-decoration:none'>Yuan Gao<sup>2</sup></a>, &ensp;
-    <a href='' target='_blank' style='text-decoration:none'>Mike Zheng Shou<sup>1,†</sup></a>, &ensp;
+    <a href='' target='_blank' style='text-decoration:none'>Mike Zheng Shou<sup>1,†</sup></a>
 </div>
 
+<div>
+    <sup>1</sup>Show Lab, National University of Singapore,  &ensp;
+    <sup>2</sup>First Intelligence,
+    <br>
+    <sub>
+        <sup>*</sup>Equal contribution.   &ensp;
+        <sup>†</sup>Corresponding authors.
+    </sub>
+</div>
 
 <p align="center">
     <span>
