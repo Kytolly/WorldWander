@@ -13,12 +13,12 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 </div>
 
 <div>
-    <sup>1</sup>Show Lab, National University of Singapore,  &ensp;
-    <sup>2</sup>First Intelligence,
+    <sup>1</sup>Show Lab, National University of Singapore &ensp;
+    <sup>2</sup>First Intelligence
     <br>
     <sub>
         <sup>*</sup>Equal contribution.   &ensp;
-        <sup>†</sup>Corresponding authors.
+        <sup>†</sup>Corresponding author.
     </sub>
 </div>
 
@@ -29,11 +29,11 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
     </span>
     <span> 
         <a href='https://lulupig12138.github.io/WorldWander' target="_blank">
-        <img src='' alt='Project Page'></a>  &emsp;  &emsp;
+        <img src='https://img.shields.io/badge/Project_Page-WorldWander-green' alt='Project Page'></a>  &emsp;  &emsp;
     </span>
     <span> 
         <a href='' target="_blank"> 
-        <img src='' alt='Hugging Face'></a> &emsp;  &emsp;
+        <img src='https://img.shields.io/badge/Datasets-WorldWander-yellow' alt='Hugging Face'></a> &emsp;  &emsp;
     </span>
 </p>
 
@@ -42,7 +42,7 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 
 
 ## 🎬 Teaser
-<b>TL;DR:</b> We propose WorldWander, an in-context learning framework tailored for translating between egocentric and exocentric worlds in video generation. We also release [EgoExo-8K](XXX), a large-scale dataset containing synchronized egocentric–exocentric triplets. The teaser is shown below:
+<b>TL;DR:</b> We propose WorldWander, an in-context learning framework for translating between egocentric and exocentric worlds in video generation. We also release [EgoExo-8K](XXX), a large-scale dataset containing synchronized egocentric–exocentric triplets. The teaser is shown below:
 ![Overall Framework](assets/teaser.png)
 
 
