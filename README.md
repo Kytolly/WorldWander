@@ -6,7 +6,7 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 
 <div>
     <a href='' target='_blank' style='text-decoration:none'>Quanjian Song<sup>1,2*</sup></a>, &ensp;
-    <a href='' target='_blank' style='text-decoration:none'>Yiren Song<sup>1，2*</sup></a>, &ensp;
+    <a href='' target='_blank' style='text-decoration:none'>Yiren Song<sup>1,2*</sup></a>, &ensp;
     <a href='' target='_blank' style='text-decoration:none'>Kelly Peng<sup>2</sup></a>, &ensp;
     <a href='' target='_blank' style='text-decoration:none'>Yuan Gao<sup>2</sup></a>, &ensp;
     <a href='' target='_blank' style='text-decoration:none'>Mike Zheng Shou<sup>1,†</sup></a>
