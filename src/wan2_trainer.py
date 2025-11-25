@@ -16,8 +16,8 @@ from tools.util import masks_like, resolve_strategy
 
 from diffusers import AutoencoderKLWan
 from diffusers.utils import export_to_video
-from models.wan2.custom_pipeline_rope import CustomWanPipeline
-from models.wan2.transformer_wan_rope import CustomWanTransformer3DModel
+from models.wan2.custom_pipeline import CustomWanPipeline
+from models.wan2.transformer_wan import CustomWanTransformer3DModel
 
 from datasets.custom_dataset import CustomTrainDataset
 from tools.my_schedule import FlowMatchScheduler
@@ -101,7 +101,7 @@ class WorldWanderTrainSystem(L.LightningModule):
     def process_data(self, batch, batch_idx):
         first_pixel_values = batch["first_pixel_values"] # B, C, F, H, W
         third_pixel_values = batch["third_pixel_values"] # B, C, F, H, W
-        ref_pixel_values = batch['ref_pixel_values'].unsqueeze(2) # # B, C, 1, H, W
+        ref_pixel_values = batch['ref_pixel_values'].unsqueeze(2) if self.hparams.dataset.is_one2three else None # # B, C, 1, H, W
         prompts = batch["prompts"]
         drop_ratio = 0.1
         if self.hparams.use_drop_text:
@@ -114,8 +114,9 @@ class WorldWanderTrainSystem(L.LightningModule):
         third_pixel_values = self.vae.encode(third_pixel_values).latent_dist.sample() # [B, C, F, H, W]
         third_pixel_values = (third_pixel_values - self.latents_mean) / self.latents_std # scaling
         # ref frame
-        ref_pixel_values = self.vae.encode(ref_pixel_values).latent_dist.sample() # [B, C, 1, H, W]
-        ref_pixel_values = (ref_pixel_values - self.latents_mean) / self.latents_std # scaling
+        if self.hparams.dataset.is_one2three:
+            ref_pixel_values = self.vae.encode(ref_pixel_values).latent_dist.sample() # [B, C, 1, H, W]
+            ref_pixel_values = (ref_pixel_values - self.latents_mean) / self.latents_std # scaling
         # encode prompts
         prompt_embeds = self.encode_prompt(prompts)
 
@@ -193,8 +194,7 @@ class WorldWanderTrainSystem(L.LightningModule):
         # data process
         first_pixel_values = batch["first_pixel_values"] # B, C, F, H, W
         third_pixel_values = batch["third_pixel_values"] # B, C, F, H, W
-        ref_pixel_values = batch['ref_pixel_values'].unsqueeze(2) # # B, C, 1, H, W
-        ori_ref_pixel_values = ref_pixel_values
+        ref_pixel_values = batch['ref_pixel_values'].unsqueeze(2) if self.hparams.dataset.is_one2three else None # # B, C, 1, H, W
         prompts = batch["prompts"]
         # ---------------------------------------------------------------------------------
         if self.hparams.dataset.is_one2three:
@@ -202,14 +202,16 @@ class WorldWanderTrainSystem(L.LightningModule):
             video_gt = ((video_gt + 1) * 0.5).clamp(0, 1)
             video_gt = video_gt.permute(0, 2, 3, 1).cpu().numpy()
             #
+            meta_ref = ref_pixel_values.squeeze(0).repeat(1, self.hparams.dataset.sample_n_frames, 1, 1).permute(1, 2, 3, 0)
+            meta_ref = ((meta_ref + 1) * 0.5).clamp(0, 1).cpu().numpy()
             ref_pixel_values = self.vae.encode(ref_pixel_values).latent_dist.sample()
             ref_pixel_values = (ref_pixel_values - self.latents_mean) / self.latents_std
-            meta = first_pixel_values.squeeze(0).permute(1, 0, 2, 3)
-            meta = ((meta + 1) * 0.5).clamp(0, 1)
-            meta = meta.permute(0, 2, 3, 1).cpu().numpy()
             #
+            meta_video = first_pixel_values.squeeze(0).permute(1, 2, 3, 0)
+            meta_video = ((meta_video + 1) * 0.5).clamp(0, 1).cpu().numpy()
             first_pixel_values = self.vae.encode(first_pixel_values).latent_dist.sample() # [B, C, F, H, W]
             first_pixel_values = (first_pixel_values - self.latents_mean) / self.latents_std # scaling
+            #
             attention_kwargs = {
                 'encoder_condition_states': first_pixel_values,
                 'encoder_ref_states': ref_pixel_values,
@@ -220,12 +222,11 @@ class WorldWanderTrainSystem(L.LightningModule):
             video_gt = ((video_gt + 1) * 0.5).clamp(0, 1)
             video_gt = video_gt.permute(0, 2, 3, 1).cpu().numpy()
             #
-            meta = third_pixel_values.squeeze(0).permute(1, 0, 2, 3)
-            meta = ((meta + 1) * 0.5).clamp(0, 1)
-            meta = meta.permute(0, 2, 3, 1).cpu().numpy()
-            #
+            meta_video = third_pixel_values.squeeze(0).permute(1, 2, 3, 0)
+            meta_video = ((meta_video + 1) * 0.5).clamp(0, 1).cpu().numpy()
             third_pixel_values = self.vae.encode(third_pixel_values).latent_dist.sample() # [B, C, F, H, W]
             third_pixel_values = (third_pixel_values - self.latents_mean) / self.latents_std # scaling
+            #
             attention_kwargs = {
                 'encoder_condition_states': third_pixel_values,
                 'use_collaborative_position_encoding': self.hparams.use_collaborative_position_encoding,
@@ -241,13 +242,12 @@ class WorldWanderTrainSystem(L.LightningModule):
         )
         video_generate = video_generate.frames[0]   
         #
-        concatenated_video = np.concatenate([meta, video_generate, video_gt], axis=1)
+        if self.hparams.dataset.is_one2three:
+            concatenated_video = np.concatenate([meta_ref, meta_video, video_generate, video_gt], axis=1)
+        else:
+            concatenated_video = np.concatenate([meta_video, video_generate, video_gt], axis=1)
         val_video_path = os.path.join(self.val_path, f"val_{self.global_step}step-batch_{batch_idx}-rank{self.trainer.global_rank}.mp4")
         export_to_video(concatenated_video, output_video_path=val_video_path, fps=self.hparams.dataset.fps)
-        #
-        ori_ref_pixel_values = torchvision.transforms.functional.to_pil_image(((ori_ref_pixel_values.squeeze(0).squeeze(1) + 1) * 0.5).clamp(0,1))
-        ref_frame_path = os.path.join(self.val_path, f"first_frame_{self.global_step}step-batch_{batch_idx}-rank{self.trainer.global_rank}.png")
-        ori_ref_pixel_values.save(ref_frame_path)
         # upload to logger
         if self.trainer.is_global_zero and isinstance(self.logger, WandbLogger):
             self.logger.experiment.log({
@@ -274,8 +274,8 @@ class WorldWanderTrainSystem(L.LightningModule):
         # configrue optimizer
         optimizer = torch.optim.AdamW(
             params_and_lrs,
-            betas=(0.9, 0.95), # 一般固定
-            eps=1e-8, # 一般固定
+            betas=(0.9, 0.95),
+            eps=1e-8,
             weight_decay=self.hparams.training.weight_decay,  # 默认 0.01
         )
         # configrue scheduler
@@ -327,6 +327,7 @@ def main(opt):
         #
         height=opt.dataset.height,
         width=opt.dataset.width,
+        resize_long=opt.dataset.resize_long,
         sample_n_frames=opt.dataset.sample_n_frames,
         stride=opt.dataset.stride,
         is_one2three=opt.dataset.is_one2three,
@@ -348,6 +349,7 @@ def main(opt):
         # 
         height=opt.dataset.height,
         width=opt.dataset.width,
+        resize_long=opt.dataset.resize_long,
         sample_n_frames=opt.dataset.sample_n_frames,
         stride=opt.dataset.stride,
         is_one2three=opt.dataset.is_one2three,

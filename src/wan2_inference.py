@@ -8,8 +8,8 @@ from PIL import Image
 
 from datasets.custom_dataset import CustomTestDataset
 from torch.utils.data import DataLoader
-from models.wan2.custom_pipeline_rope import CustomWanPipeline
-from src.wan2_trainer_rope import WorldWanderTrainSystem
+from models.wan2.custom_pipeline import CustomWanPipeline
+from src.wan2_trainer import WorldWanderTrainSystem
 
 import torch
 from diffusers.utils import export_to_video
@@ -39,47 +39,31 @@ class WorldWanderInferenceSystem(WorldWanderTrainSystem):
 
     def predict_step(self, batch, batch_idx, dataloader_idx=0):
         # data process
-        first_pixel_values = batch["first_pixel_values"] # B, C, F, H, W
-        third_pixel_values = batch["third_pixel_values"] # B, C, F, H, W
-        ref_pixel_values = batch['ref_pixel_values'].unsqueeze(2) # # B, C, 1, H, W
-        ori_ref_pixel_values = ref_pixel_values
+        input_pixel_values = batch["input_pixel_values"] # B, C, F, H, W
+        ref_pixel_values = batch['ref_pixel_values'].unsqueeze(2) if self.hparams.dataset.is_one2three else None # # B, C, 1, H, W
         prompts = batch["prompts"]
         path = batch["path"]
-        # ---------------------------------------------------------------------------------
+        # save input
+        meta_video = input_pixel_values.squeeze(0).permute(1, 2, 3, 0)
+        meta_video = ((meta_video + 1) * 0.5).clamp(0, 1).cpu().numpy()
+
         if self.hparams.dataset.is_one2three:
-            video_gt = third_pixel_values.squeeze(0).permute(1, 0, 2, 3)
-            video_gt = ((video_gt + 1) * 0.5).clamp(0, 1)
-            video_gt = video_gt.permute(0, 2, 3, 1).cpu().numpy()
-            # additional
+            meta_ref = ref_pixel_values.squeeze(0).repeat(1, self.hparams.dataset.sample_n_frames, 1, 1).permute(1, 2, 3, 0)
+            meta_ref = ((meta_ref + 1) * 0.5).clamp(0, 1).cpu().numpy()
+        # ---------------------------------------------------------------------------------
+        input_pixel_values = self.vae.encode(input_pixel_values).latent_dist.sample() # [B, C, F, H, W]
+        input_pixel_values = (input_pixel_values - self.latents_mean) / self.latents_std # scaling
+        # 
+        if self.hparams.dataset.is_one2three:
             ref_pixel_values = self.vae.encode(ref_pixel_values).latent_dist.sample()
             ref_pixel_values = (ref_pixel_values - self.latents_mean) / self.latents_std
-            # input
-            meta = first_pixel_values.squeeze(0).permute(1, 0, 2, 3)
-            meta = ((meta + 1) * 0.5).clamp(0, 1)
-            meta = meta.permute(0, 2, 3, 1).cpu().numpy()
-            #
-            first_pixel_values = self.vae.encode(first_pixel_values).latent_dist.sample() # [B, C, F, H, W]
-            first_pixel_values = (first_pixel_values - self.latents_mean) / self.latents_std # scaling
-            attention_kwargs = {
-                'encoder_condition_states': first_pixel_values,
-                'encoder_ref_states': ref_pixel_values,
-                'use_collaborative_position_encoding': self.hparams.use_collaborative_position_encoding,
-            }
         else:
-            video_gt = first_pixel_values.squeeze(0).permute(1, 0, 2, 3)
-            video_gt = ((video_gt + 1) * 0.5).clamp(0, 1)
-            video_gt = video_gt.permute(0, 2, 3, 1).cpu().numpy()
-            #
-            meta = third_pixel_values.squeeze(0).permute(1, 0, 2, 3)
-            meta = ((meta + 1) * 0.5).clamp(0, 1)
-            meta = meta.permute(0, 2, 3, 1).cpu().numpy()
-            #
-            third_pixel_values = self.vae.encode(third_pixel_values).latent_dist.sample() # [B, C, F, H, W]
-            third_pixel_values = (third_pixel_values - self.latents_mean) / self.latents_std # scaling
-            attention_kwargs = {
-                'encoder_condition_states': third_pixel_values,
-                'use_collaborative_position_encoding': self.hparams.use_collaborative_position_encoding,
-            }
+            ref_pixel_values = None
+        attention_kwargs = {
+            'encoder_condition_states': input_pixel_values,
+            'encoder_ref_states': ref_pixel_values,
+            'use_collaborative_position_encoding': self.hparams.use_collaborative_position_encoding,
+        }
         #
         video_generate = self.pred_pipeline(
             prompt=prompts,
@@ -91,26 +75,19 @@ class WorldWanderInferenceSystem(WorldWanderTrainSystem):
         )
         video_generate = video_generate.frames[0]    
         #
-        concatenated_video = np.concatenate([meta, video_generate, video_gt], axis=1)
-        
-        # save concat video
+        if self.hparams.dataset.is_one2three:
+            concatenated_video = np.concatenate([meta_ref, meta_video, video_generate], axis=1)
+        else:
+            concatenated_video = np.concatenate([meta_video, video_generate], axis=1)
         pred_video_path = os.path.join(self.pred_path, f"{path[0]}.mp4")
         export_to_video(concatenated_video, output_video_path=pred_video_path, fps=self.hparams.dataset.fps)
-
-        # save image
-        # pred_video_path = os.path.join(self.pred_path, f"{path[0]}")
-        # os.makedirs(pred_video_path, exist_ok=True)
-        # for i, frame in enumerate(video_generate):
-        #     image = numpy_to_pil(frame)[0]
-        #     image.save(os.path.join(pred_video_path, f"{i:05d}.png"))
 
         return
 
 def main(opt):
     L.seed_everything(opt.seed)
     test_dataset = CustomTestDataset(
-        first_video_root=opt.first_video_root,
-        third_video_root=opt.third_video_root,
+        original_video_root=opt.original_video_root,
         ref_image_root=opt.ref_image_root,
         #
         height=opt.dataset.height,
@@ -128,9 +105,7 @@ def main(opt):
         shuffle=False,
     )
     system = WorldWanderInferenceSystem.load_from_checkpoint(opt.ckpt_path, opt=opt)
-    # ckpt = torch.load(opt.ckpt_path)
-    # system = WorldWanderInferenceSystem(opt=opt)
-    # system.load_state_dict(ckpt['state_dict'])
+    # 
     trainer = L.Trainer(
         logger=False,
         precision=opt.training.precision,
@@ -146,12 +121,11 @@ def main(opt):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
     parser.add_argument("--config", default="configs/wan2-2_lora_three2one.yaml", help="path to the yaml config file")
-    parser.add_argument("--seed", type=int, default=42)
-    parser.add_argument("--first_video_root", type=str, help="rewrite the first_video_root in the config")
-    parser.add_argument("--third_video_root", type=str, help="rewrite the third_video_root in the config")
-    parser.add_argument("--ref_image_root", type=str, help="rewrite the ref_image_root in the config")
     parser.add_argument("--ckpt_path", type=str)
+    parser.add_argument("--original_video_root", type=str, help="original video root")
+    parser.add_argument("--ref_image_root", type=str, help="reference image root")
     parser.add_argument("--pred_path", type=str, default="", help="save path for inference")
+    parser.add_argument("--seed", type=int, default=42)
     # ----------------------------------------------------------------------
     args, extras = parser.parse_known_args()
     args = vars(args)

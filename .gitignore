@@ -2,4 +2,6 @@
 outputs
 pred_results
 trash
-ckpt
+ckpts
+EgoExoTestRealTestCrop.tar.gz
+EgoExoTestRealTestCrop.tar.gz.BaiduPCS-Go-downloading

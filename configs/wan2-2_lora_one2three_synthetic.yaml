@@ -32,6 +32,7 @@ dataset:
   is_one2three: True
   height: 704
   width: 1280
+  resize_long: 1505
   sample_n_frames: 49
   stride: 2
   fps: 8
