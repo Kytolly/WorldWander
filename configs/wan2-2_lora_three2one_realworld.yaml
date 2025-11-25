@@ -1,7 +1,7 @@
 experiment_project: 'WorldWander'
 experiment_name: 'rank-80_stride-2_v1'
 model_id: '/mnt/nfs/workspace/sqj/base_models/Wan2.2-TI2V-5B-Diffusers'
-output_root: './outputs/wan2-2_three2one'
+output_root: './outputs/wan2-2_three2one_realworld'
 use_drop_text: True
 use_lora: True
 use_collaborative_position_encoding: True
