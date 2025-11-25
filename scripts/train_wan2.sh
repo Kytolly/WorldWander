@@ -9,3 +9,9 @@ CUDA_VISIBLE_DEVICES=0,1,2,3 python src/wan2_trainer.py --config=configs/wan2-2_
 # CUDA_VISIBLE_DEVICES=0,1,2,3 python src/wan2_trainer.py --config=configs/wan2-2_lora_one2three_synthetic.yaml --seed=1234
 
 
+# three2one, real-world scenarios
+# CUDA_VISIBLE_DEVICES=0,1,2,3 python src/wan2_trainer.py --config=configs/wan2-2_lora_three2one_realworld.yaml --seed=1234
+
+
+# one2three, real-world scenarios
+# CUDA_VISIBLE_DEVICES=0,1,2,3 python src/wan2_trainer.py --config=configs/wan2-2_lora_one2three_realworld.yaml --seed=1234
