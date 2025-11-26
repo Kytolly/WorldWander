@@ -107,7 +107,7 @@ bash scripts/train_wan2.sh
 ```
 
 ## 🤝 Acknowledgements
-Anonymous thanks to the senior who taught me PyTorch-Lightning. I can now build training code from scratch on my own!
+🙏 Anonymous thanks to the senior who taught me PyTorch Lightning, enabling me to build training code on my own!
 
 
 ## 🎓 Bibtex
