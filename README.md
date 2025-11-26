@@ -106,6 +106,8 @@ For convenience, we have also provided the following training script:
 bash scripts/train_wan2.sh
 ```
 
+## 🤝 Acknowledgements
+Anonymous thanks to the senior who taught me PyTorch-Lightning. I can now build training code from scratch on my own!
 
 
 ## 🎓 Bibtex
