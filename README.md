@@ -107,7 +107,7 @@ bash scripts/train_wan2.sh
 ```
 
 ## 🤝 Acknowledgements
-🙏 This codebase borrows parts from [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) and the [Wan2.2](https://github.com/Wan-Video/Wan2.2). Many thanks to them for their open-source contributions. I also want to anonymously thank the senior who taught me PyTorch Lightning, enabling me to build training code on my own!
+🙏 This codebase borrows parts from [DiffSynth-Studio](https://github.com/modelscope/DiffSynth-Studio) and the [Wan2.2](https://github.com/Wan-Video/Wan2.2). Many thanks to them for their open-source contributions. I also want to anonymously thank the senior who taught me PyTorch Lightning, enabling me to build training code from scratch on my own!
 
 
 ## 🎓 Bibtex
