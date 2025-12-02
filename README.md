@@ -26,8 +26,8 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 
 <p align="center">
     <span>
-        <a href="" target="_blank"> 
-        <img src='' alt='Paper PDF'></a> &emsp;  &emsp; 
+        <a href="https://arxiv.org/pdf/2511.22098" target="_blank"> 
+        <img src='https://img.shields.io/badge/arXiv%202511.22098-WorldWander-red' alt='Paper PDF'></a> &emsp;  &emsp; 
     </span>
     <span> 
         <a href='https://lulupig12138.github.io/WorldWander' target="_blank">
