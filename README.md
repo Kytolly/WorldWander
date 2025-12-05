@@ -58,7 +58,7 @@ Overall framework is shown below:
 
 
 ## 🤗 Datasets
-To further support our task, we curate <b>[EgoExo-8K](XXX)</b>, a large-scale dataset containing synchronized egocentric–exocentric triplets from both <i>synthetic</i> and <i>real-world</i> scenarios.
+To further support our task, we curate [EgoExo-8K](XXX), a large-scale dataset containing synchronized egocentric–exocentric triplets from both <i>synthetic</i> and <i>real-world</i> scenarios.
 We show some examples below:
 ![Datasets Example](assets/datasets_example.png)
 
