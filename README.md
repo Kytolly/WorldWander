@@ -41,7 +41,10 @@ WorldWander: Bridging Egocentric and Exocentric Worlds in Video Generation
 
 </div>
 
-
+## 🎉 News
+<pre>
+• <strong>2025.12</strong>: 🔥 Our paper, training code, and project page are released.
+</pre>
 
 ## 🎬 Teaser
 <b>TL;DR:</b> We propose WorldWander, an in-context learning framework for translating between egocentric and exocentric worlds in video generation. We also release [EgoExo-8K](XXX), a large-scale dataset containing synchronized egocentric–exocentric triplets. The teaser is shown below:
