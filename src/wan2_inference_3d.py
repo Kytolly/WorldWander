@@ -9,7 +9,7 @@ from PIL import Image
 from datasets.custom_dataset import CustomTestDataset
 from torch.utils.data import DataLoader
 from models.wan2.custom_pipeline import CustomWanPipeline
-from src.wan2_trainer import WorldWanderTrainSystem
+from src.wan2_trainer_3d import WorldWanderTrainSystem3d
 
 import torch
 from diffusers.utils import export_to_video
@@ -17,7 +17,7 @@ from diffusers.utils import numpy_to_pil
 from diffusers import FlowMatchEulerDiscreteScheduler, UniPCMultistepScheduler
 
 
-class WorldWanderInferenceSystem(WorldWanderTrainSystem):
+class WorldWanderInferenceSystem3d(WorldWanderTrainSystem3d):
     # custom load ckpt
     def load_state_dict(self, state_dict, strict: bool = True):
         # only load the lora
@@ -43,6 +43,9 @@ class WorldWanderInferenceSystem(WorldWanderTrainSystem):
         ref_pixel_values = batch['ref_pixel_values'].unsqueeze(2) if self.hparams.dataset.is_one2three else None # # B, C, 1, H, W
         prompts = batch["prompts"]
         path = batch["path"]
+        
+        exo_warped_depth_pixel_values = batch["exo_warped_depth_pixel_values"]
+        
         # save input
         meta_video = input_pixel_values.squeeze(0).permute(1, 2, 3, 0)
         meta_video = ((meta_video + 1) * 0.5).clamp(0, 1).cpu().numpy()
@@ -53,6 +56,11 @@ class WorldWanderInferenceSystem(WorldWanderTrainSystem):
         # ---------------------------------------------------------------------------------
         input_pixel_values = self.vae.encode(input_pixel_values).latent_dist.sample() # [B, C, F, H, W]
         input_pixel_values = (input_pixel_values - self.latents_mean) / self.latents_std # scaling
+        
+        # 深度视频编码
+        exo_warped_depth_pixel_values = self.vae.encode(exo_warped_depth_pixel_values).latent_dist.sample()
+        exo_warped_depth_pixel_values = (exo_warped_depth_pixel_values - self.latents_mean) / self.latents_std
+        
         # 
         if self.hparams.dataset.is_one2three:
             ref_pixel_values = self.vae.encode(ref_pixel_values).latent_dist.sample()
@@ -91,8 +99,8 @@ class WorldWanderInferenceSystem(WorldWanderTrainSystem):
 def main(opt):
     L.seed_everything(opt.seed)
     test_dataset = CustomTestDataset(
-        original_video_root=opt.original_video_root,
-        ref_image_root=opt.ref_image_root,
+        json_index_path=opt.dataset.get('json_index_path', None),
+        video_root=opt.dataset.get('video_root', None),
         #
         height=opt.dataset.height,
         width=opt.dataset.width,
@@ -108,7 +116,7 @@ def main(opt):
         pin_memory=opt.dataset.pin_memory,
         shuffle=False,
     )
-    system = WorldWanderInferenceSystem.load_from_checkpoint(opt.ckpt_path, opt=opt)
+    system = WorldWanderInferenceSystem3d.load_from_checkpoint(opt.ckpt_path, opt=opt)
     # 
     trainer = L.Trainer(
         logger=False,
@@ -124,7 +132,7 @@ def main(opt):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument("--config", default="configs/wan2-2_lora_three2one.yaml", help="path to the yaml config file")
+    parser.add_argument("--config", default="configs/my_train_3d.yaml", help="path to the yaml config file")
     parser.add_argument("--ckpt_path", type=str)
     parser.add_argument("--original_video_root", type=str, help="original video root")
     parser.add_argument("--ref_image_root", type=str, help="reference image root")

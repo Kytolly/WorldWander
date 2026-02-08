@@ -3,7 +3,7 @@ import json
 import random
 import numpy as np
 from PIL import Image
-from decord import VideoReader
+from decord import VideoReader, cpu
 import torch
 from torchvision import transforms
 from torch.utils.data import Dataset
@@ -24,9 +24,8 @@ class ResizeByLongSide:
 class CustomTrainDataset(Dataset):
     def __init__(
         self,
-        json_index_path,           # 必需：主索引文件路径
-        followbench_root,          # 必需：原始数据根目录 (e.g. .../FollowBench/train)
-        warped_video_root,         # 必需：Warp 数据根目录 (e.g. .../WarpedVideo/train)
+        json_index_path,
+        video_root,          
         height=512,
         width=512,
         resize_long=1505,
@@ -40,15 +39,13 @@ class CustomTrainDataset(Dataset):
         self.training_len = training_len
         self.is_one2three = is_one2three
         
-        self.followbench_root = followbench_root
-        self.warped_video_root = warped_video_root
+        self.video_root = video_root
         
         self.height = height
         self.width = width
         self.resize_long = resize_long
         self.sample_n_frames = sample_n_frames
         
-        # [核心修复] 加载 JSON 并转换为列表
         print(f"[Dataset] Loading index: {json_index_path}")
         with open(json_index_path, 'r') as f:
             data_raw = json.load(f)
@@ -89,21 +86,19 @@ class CustomTrainDataset(Dataset):
         # 循环取数据，防止 index 越界
         item = self.data_list[index % len(self.data_list)]
         
-        # [核心修复] 1. 使用您 JSON 中的正确键名解析路径
-        # JSON 示例: "the first view": "train_case_08644/ego.mp4"
-        ego_rel = item.get('the first view')
-        exo_rel = item.get('the third view')
-        ref_rel = item.get('reference')
+        # 1. 解析路径
+        ego_rel = item.get('ego video path')
+        exo_rel = item.get('exo video path')
+        ref_rel = item.get('reference image path')
+        ego_depth_rel = item.get('ego depth video path')
+        exo_gt_depth_rel = item.get('exo gt depth video path')
+        exo_warped_depth_rel = item.get('exo warped depth video path')
         
-        # 拼接完整路径
         ego_path = os.path.join(self.followbench_root, ego_rel)
         exo_path = os.path.join(self.followbench_root, exo_rel)
-        
-        # [核心修复] 2. 解析 Warped Video 路径
-        # 逻辑：WarpedVideo 保持同样的目录结构，文件名固定为 ego_warped_video.mp4
-        # ego_rel 是 "train_case_08644/ego.mp4"，dirname 是 "train_case_08644"
-        case_folder = os.path.dirname(ego_rel) 
-        warped_path = os.path.join(self.warped_video_root, case_folder, "ego_warped_video.mp4")
+        ego_depth_path = os.path.join(self.followbench_root, ego_depth_rel)
+        exo_gt_depth_path = os.path.join(self.followbench_root, exo_gt_depth_rel)
+        exo_warped_depth_path = os.path.join(self.followbench_root, exo_warped_depth_rel)
         
         ref_path = None
         if self.is_one2three and ref_rel:
@@ -113,16 +108,9 @@ class CustomTrainDataset(Dataset):
         try:
             ego_vr = VideoReader(ego_path)
             exo_vr = VideoReader(exo_path)
-            
-            # 检查 Warped 视频是否存在
-            if os.path.exists(warped_path):
-                warped_vr = VideoReader(warped_path)
-            else:
-                # 训练时通常要求存在，如果不存在可以报错或生成全黑
-                # 这里为了稳健，如果找不到就生成全黑占位 (需注意这会失去几何引导)
-                # print(f"[Warning] Warped video not found: {warped_path}")
-                warped_vr = None 
-                
+            ego_depth_vr = VideoReader(ego_depth_path)
+            exo_gt_depth_vr = VideoReader(exo_gt_depth_path)
+            exo_warped_depth_vr = VideoReader(exo_warped_depth_path)     
         except Exception as e:
             print(f"[Dataset Error] Failed to load {item}: {e}")
             # 随机换一个样本重试
@@ -131,9 +119,11 @@ class CustomTrainDataset(Dataset):
         # 4. 采样索引 (确保时间对齐)
         len_ego = len(ego_vr)
         len_exo = len(exo_vr)
-        len_warped = len(warped_vr) if warped_vr else len_ego
+        len_ego_depth = len(ego_depth_vr)
+        len_exo_gt_depth = len(exo_gt_depth_vr)
+        len_exo_warped_depth = len(exo_warped_depth_vr)
         
-        min_len = min(len_ego, len_exo, len_warped)
+        min_len = min(len_ego, len_exo, len_ego_depth, len_exo_gt_depth, len_exo_warped_depth)
         
         # 确保有足够的帧
         if min_len < self.sample_n_frames:
@@ -153,12 +143,9 @@ class CustomTrainDataset(Dataset):
 
         ego_pixel = load_frames(ego_vr, indices).permute(1, 0, 2, 3)    # [C, F, H, W]
         exo_pixel = load_frames(exo_vr, indices).permute(1, 0, 2, 3)    # [C, F, H, W]
-        
-        if warped_vr:
-            warped_pixel = load_frames(warped_vr, indices).permute(1, 0, 2, 3)
-        else:
-            # Fallback: 全黑 (C, F, H, W)
-            warped_pixel = torch.zeros_like(ego_pixel)
+        ego_depth_pixel = load_frames(ego_depth_vr, indices).permute(1, 0, 2, 3)    # [C, F, H, W]
+        exo_gt_depth_pixel = load_frames(exo_gt_depth_vr, indices).permute(1, 0, 2, 3)    # [C, F, H, W]
+        exo_warped_depth_pixel = load_frames(exo_warped_depth_vr, indices).permute(1, 0, 2, 3)    # [C, F, H, W]
 
         ref_pixel = []
         if self.is_one2three and ref_path:
@@ -170,121 +157,143 @@ class CustomTrainDataset(Dataset):
         elif self.is_one2three:
              ref_pixel = torch.zeros((3, self.height, self.width))
 
-        # Prompt 处理 (如果没有 prompt 字段则使用默认)
-        prompt = item.get('prompt', 'Transform ego view to exo view.')
+        # Prompt 处理
+        prompt = 'Transform it into the third-person perspective.' \
+                if self.is_one2three else 'Transform it into the first-person perspective.'
 
         return {
             'ref_pixel_values': ref_pixel,       # [C, H, W]
             'first_pixel_values': ego_pixel,     # [C, F, H, W]
             'third_pixel_values': exo_pixel,     # [C, F, H, W]
-            'warped_pixel_values': warped_pixel, # [C, F, H, W]
+            'ego_depth_pixel_values': ego_depth_pixel, # [C, F, H, W]
+            'exo_gt_depth_pixel_values': exo_gt_depth_pixel, # [C, F, H, W]
+            'exo_warped_depth_pixel_values': exo_warped_depth_pixel, # [C, F, H, W]
             'prompts': prompt,
         }
         
 class CustomTestDataset(Dataset):
     def __init__(
         self,
-        original_video_root,
-        ref_image_root=None,
+        json_path,                 
+        video_root,                
         height=512,
         width=512,
+        resize_long=1280,
         sample_n_frames=49,
-        stride=1,
-        is_one2three=False,
+        stride=2,
+        is_one2three=True,
         training_len=-1,
+        **kwargs
     ):  
-        self.stride = stride
-        self.training_len = training_len
-        self.is_one2three = is_one2three
-        #
-        self.original_video_root = original_video_root
-        if self.is_one2three:
-            self.ref_image_root = ref_image_root
-        #
+        self.json_path = json_path
+        self.video_root = video_root
         self.height = height
         self.width = width
+        self.resize_long = resize_long
         self.sample_n_frames = sample_n_frames
-        #
-        self.original_video_paths = [os.path.join(self.original_video_root, video) for video in sorted(os.listdir(self.original_video_root))]
+        self.stride = stride
+        self.is_one2three = is_one2three
+        self.training_len = training_len
+
+        print(f"[CustomTestDataset] Loading index from: {json_path}")
+        if not os.path.exists(json_path):
+            raise FileNotFoundError(f"Index file not found: {json_path}")
+            
+        with open(json_path, 'r') as f:
+            data = json.load(f)
+        
+        if isinstance(data, dict):
+            self.samples = [data[k] for k in sorted(data.keys())]
+        else:
+            self.samples = data
+            
+        print(f"[CustomTestDataset] Loaded {len(self.samples)} samples.")
+
+        self.video_transforms = transforms.Compose([
+            ResizeByLongSide(self.resize_long), 
+            transforms.CenterCrop([self.height, self.width]),
+            transforms.ToTensor(),
+            transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+        ])
+        
         if self.is_one2three:
-            self.ref_image_paths = [os.path.join(self.ref_image_root, image) for image in sorted(os.listdir(self.ref_image_root))]
-        # video transforms
-        self.test_video_transforms = transforms.Compose(
-            [
-                # ResizeByLongSide(1505), 
-                # transforms.CenterCrop((height, width)),
+            self.image_transforms = transforms.Compose([
+                transforms.Resize([self.height, self.width]),
                 transforms.ToTensor(),
-                transforms.Normalize(
-                    mean=[0.5, 0.5, 0.5],  
-                    std=[0.5, 0.5, 0.5]
-                )
-            ]
-        )
-        if self.is_one2three:
-            # image transforms
-            self.test_image_transforms = transforms.Compose(
-                [
-                    # ResizeByLongSide(1505), 
-                    # transforms.CenterCrop((height, width)),
-                    transforms.ToTensor(),
-                    transforms.Normalize(
-                        mean=[0.5, 0.5, 0.5],  
-                        std=[0.5, 0.5, 0.5]
-                    )
-                ]
-            )
-        # 
-        self.original_video_len = len(self.original_video_paths)
-        if self.is_one2three:
-            self.ref_image_len = len(self.ref_image_paths)
-            assert self.original_video_len == self.ref_image_len, "mismatch in original videos and reference images"
+                transforms.Normalize(mean=[0.5, 0.5, 0.5], std=[0.5, 0.5, 0.5])
+            ])
 
     def __len__(self):
-        if self.training_len == -1:
-            return self.original_video_len
-        else:
-            return self.training_len
+        return self.training_len if self.training_len > 0 else len(self.samples)
+
+    def _load_frames(self, vr, indices):
+        frames = vr.get_batch(indices).asnumpy()
+        return torch.stack([self.video_transforms(Image.fromarray(f)) for f in frames])
 
     def __getitem__(self, index):
-        index = index % self.original_video_len
-
+        sample_idx = index % len(self.samples)
+        item = self.samples[sample_idx]
+        
+        ego_rel = item.get('ego video path')
+        exo_rel = item.get('exo video path')
+        
+        # 确定 Input Video 路径
         if self.is_one2three:
-            ref_image_path = self.ref_image_paths[index]
-            ref_image = Image.open(ref_image_path).convert("RGB")
-            ref_pixel_values = self.test_image_transforms(ref_image)
+            input_rel = ego_rel
         else:
-            ref_pixel_values = []
+            input_rel = exo_rel
+            
+        if not input_rel:
+             raise ValueError(f"Missing input video path in sample: {item}")
+             
+        input_path = os.path.join(self.video_root, input_rel)
+        ref_rel = item.get('reference image path')
+        ref_path = os.path.join(self.video_root, ref_rel) if (self.is_one2three and ref_rel) else None
 
-        original_video_path = self.original_video_paths[index]
-        input_frame_list = [os.path.join(original_video_path, frame_path) for frame_path in sorted(os.listdir(original_video_path))]
-        input_frame_list = [Image.open(frame_path).convert("RGB") for frame_path in input_frame_list]
-        input_pixel_values = torch.stack([self.test_video_transforms(frame) for frame in input_frame_list]) # F, C, H, W
+        # 深度路径解析
+        depth_paths = {}
+        for key in ['ego depth video path', 'exo gt depth video path', 'exo warped depth video path']:
+            if item.get(key):
+                depth_paths[key] = os.path.join(self.video_root, item[key])
+
+        if not os.path.exists(input_path): raise FileNotFoundError(f"Input video not found: {input_path}")
+        vr_input = VideoReader(input_path, ctx=cpu(0))
         
-        # additional return path for save name
-        path = original_video_path.split('/')[-1]
+        # 深度视频读取
+        vr_depths = {}
+        for k, v in depth_paths.items():
+            if not os.path.exists(v): raise FileNotFoundError(f"Depth video not found: {v}")
+            vr_depths[k] = VideoReader(v, ctx=cpu(0))
+
+        # 长度检查 (Test set 通常取 min length)
+        len_video = len(vr_input)
+        for vr in vr_depths.values():
+            len_video = min(len_video, len(vr))
+
+        required_span = (self.sample_n_frames - 1) * self.stride + 1
+        if len_video < required_span:
+             raise ValueError(f"Test video too short: {len_video} < {required_span}. Path: {input_path}")
         
-        # return
-        return {
-            'ref_pixel_values': ref_pixel_values, # C, H, W
-            'input_pixel_values': input_pixel_values.permute(1, 0, 2, 3), # C, F, H, W
+        # 确定性采样：从第0帧开始
+        start_idx = 0
+        indices = [start_idx + i * self.stride for i in range(self.sample_n_frames)]
+        
+        input_pixels = self._load_frames(vr_input, indices).permute(1, 0, 2, 3) # [C, F, H, W]
+        
+        data_dict = {
+            'input_pixel_values': input_pixels,
             'prompts': 'Transform it into the third-person perspective.' if self.is_one2three else 'Transform it into the first-person perspective.',
-            'path': path,
+            'path': os.path.basename(input_rel).split('.')[0] 
         }
+        
+        if self.is_one2three:
+            if not ref_path or not os.path.exists(ref_path):
+                raise FileNotFoundError(f"Ref image not found: {ref_path}")
+            ref_img = Image.open(ref_path).convert("RGB")
+            data_dict['ref_pixel_values'] = self.image_transforms(ref_img)
+        else:
+            data_dict['ref_pixel_values'] = []
 
-
-# for debug
-if __name__ == '__main__':
-    my_dataset = CustomTrainDataset(
-        video_root='your-path1',
-        video_root2='your-path2',
-        first_video_root='your-path3',
-        height=480,
-        width=720,
-        sample_n_frames=81,
-    )
-    my_dataloader = DataLoader(my_dataset,
-                               batch_size=1,
-                               shuffle=False)
-    #
-    for batch in my_dataset:
-        breakpoint()
+        # 深度数据加载
+        data_dict['exo_warped_depth_pixel_values'] = self._load_frames(vr_depths['exo warped depth video path'], indices).permute(1, 0, 2, 3)
+        return data_dict
