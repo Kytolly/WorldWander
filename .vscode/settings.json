@@ -1,0 +1,9 @@
+{
+    "python.analysis.extraPaths": [
+        "/opt/liblibai-models/user-workspace2/users/xqy/library/",
+        "/opt/liblibai-models/user-workspace2/users/xqy/library/Self-Forcing",
+        "/opt/liblibai-models/user-workspace2/users/xqy/library/VACE",
+        "/opt/liblibai-models/user-workspace2/users/xqy/library/vggt",
+    ],
+    "python.analysis.autoSearchPaths": true,
+}
